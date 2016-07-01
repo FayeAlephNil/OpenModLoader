@@ -1,6 +1,23 @@
 --- /net/minecraft/server
 +++ /net/minecraft/server
-@@ -523,6 +523,7 @@
+@@ -358,6 +358,7 @@
+ 
+     public void stopServer() {
+         LOG.info("Stopping server");
++        xyz.openmodloader.OpenModLoader.getEventBus().post(new xyz.openmodloader.event.impl.ServerEvent.Stopping(this));
+         if(this.getNetworkSystem() != null) {
+             this.getNetworkSystem().terminateEndpoints();
+         }
+@@ -389,7 +390,7 @@
+         if(this.usageSnooper.isSnooperRunning()) {
+             this.usageSnooper.stopSnooper();
+         }
+-
++        xyz.openmodloader.OpenModLoader.getEventBus().post(new xyz.openmodloader.event.impl.ServerEvent.Stopped(this));
+     }
+ 
+     public boolean isServerRunning() {
+@@ -523,6 +524,7 @@
      }
  
      public void tick() {
