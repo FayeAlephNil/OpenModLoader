@@ -60,6 +60,7 @@ public abstract class ServerEvent extends Event {
 
         public void registerCommand(ICommand command) {
             Map<String, ICommand> map = getServer().commandManager.getCommands();
+            map.put(command.getCommandName(), command);
             command.getCommandAliases().stream().forEach((k) -> map.put(k, command));
         }
     }
