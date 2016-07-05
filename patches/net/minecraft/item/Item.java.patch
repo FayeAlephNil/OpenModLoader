@@ -6,8 +6,8 @@
  public class Item {
 -    public static final RegistryNamespaced<ResourceLocation, Item> REGISTRY = new RegistryNamespaced();
 -    private static final Map<Block, Item> BLOCK_TO_ITEM = Maps.newHashMap();
-+    public static final xyz.openmodloader.registry.NamespacedRegistry<ResourceLocation, Item> REGISTRY = xyz.openmodloader.registry.OMLRegistry.getRegistry(Item.class);
-+    private static final Map<Block, Item> BLOCK_TO_ITEM = xyz.openmodloader.registry.OMLRegistry.getBlockItemMap();
++    public static final xyz.openmodloader.registry.AutomaticNamespacedRegistry<ResourceLocation, Item> REGISTRY = xyz.openmodloader.registry.Registries.register(Item.class);
++    private static final Map<Block, Item> BLOCK_TO_ITEM = xyz.openmodloader.registry.Registries.getBlockItemMap();
      private static final IItemPropertyGetter DAMAGED_GETTER = new IItemPropertyGetter() {
          @Strippable(
              side = Side.CLIENT

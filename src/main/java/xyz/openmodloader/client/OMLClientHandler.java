@@ -16,7 +16,7 @@ import xyz.openmodloader.event.impl.MessageEvent;
 import xyz.openmodloader.event.impl.UpdateEvent;
 import xyz.openmodloader.launcher.strippable.Side;
 import xyz.openmodloader.launcher.strippable.Strippable;
-import xyz.openmodloader.modloader.ModContainer;
+import xyz.openmodloader.modloader.ModInfo;
 import xyz.openmodloader.modloader.ModLoader;
 import xyz.openmodloader.util.ReflectionHelper;
 
@@ -25,7 +25,7 @@ public class OMLClientHandler implements SidedHandler {
     @Override
     public void onInitialize() {
         List<IResourcePack> modResourcePacks = new ArrayList<>();
-        for (ModContainer mod : ModLoader.getModList()) {
+        for (ModInfo mod : ModLoader.getModList()) {
             File file = mod.getModFile();
             if (file.isDirectory()) {
                 modResourcePacks.add(new OMLFolderResourcePack(mod));

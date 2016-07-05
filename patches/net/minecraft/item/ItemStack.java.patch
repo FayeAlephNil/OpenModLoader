@@ -9,18 +9,11 @@
                  int var4 = 0;
  
                  for(int var5 = 0; var3 > 0 && var5 < var1; ++var5) {
-@@ -773,4 +773,14 @@
+@@ -773,4 +773,7 @@
              return false;
          }
      }
 +
-+    public boolean equals(Object obj) {
-+        if (this == obj) return true;
-+        if (!(obj instanceof ItemStack)) return false;
-+        return this.isItemStackEqual((ItemStack) obj);
-+    }
-+
-+    public int hashCode() {
-+        return java.util.Objects.hash(Item.getIdFromItem(item), stackSize, itemDamage, stackTagCompound);
-+    }  
++    public boolean equals(Object obj) { return this == obj || obj instanceof ItemStack && isItemStackEqual((ItemStack) obj); }
++    public int hashCode() { return java.util.Objects.hash(Item.getIdFromItem(item), stackSize, itemDamage, stackTagCompound); }
  }

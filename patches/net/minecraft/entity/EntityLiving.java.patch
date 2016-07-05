@@ -8,7 +8,15 @@
          ItemStack var2 = var1.getEntityItem();
          EntityEquipmentSlot var3 = getSlotForItemStack(var2);
          boolean var4 = true;
-@@ -736,6 +737,9 @@
+@@ -582,6 +583,7 @@
+         } else {
+             EntityPlayer var1 = this.worldObj.getClosestPlayerToEntity(this, -1.0D);
+             if(var1 != null) {
++                if (xyz.openmodloader.event.impl.LivingEvent.Despawn.handle(this).isCanceled()) return;
+                 double var2 = var1.posX - this.posX;
+                 double var4 = var1.posY - this.posY;
+                 double var6 = var1.posZ - this.posZ;
+@@ -736,6 +738,9 @@
      }
  
      public void setItemStackToSlot(EntityEquipmentSlot var1, @Nullable ItemStack var2) {

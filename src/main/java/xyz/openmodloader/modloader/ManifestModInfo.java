@@ -25,7 +25,11 @@ import xyz.openmodloader.OpenModLoader;
 import xyz.openmodloader.launcher.strippable.Side;
 import xyz.openmodloader.modloader.version.Version;
 
-class ManifestModContainer implements ModContainer {
+/**
+ * An implementation of {@link ModInfo} that is used for mods loaded directly
+ * from a manifest file.
+ */
+class ManifestModInfo implements ModInfo {
 
     private transient Class<?> mainClass;
     private transient ResourceLocation logoTexture;
@@ -68,14 +72,14 @@ class ManifestModContainer implements ModContainer {
     /**
      * Uses a manifest to create a mod container.
      */
-    public static ManifestModContainer create(File modFile, Manifest manifest) {
+    public static ManifestModInfo create(File modFile, Manifest manifest) {
         Set<Object> attributeNames = manifest.getMainAttributes().keySet();
         if (!attributeNames.contains(new Attributes.Name("ID"))) {
             return null;
         }
-        ManifestModContainer container = new ManifestModContainer();
+        ManifestModInfo container = new ManifestModInfo();
         Attributes attributes = manifest.getMainAttributes();
-        for (Field field : ManifestModContainer.class.getDeclaredFields()) {
+        for (Field field : ManifestModInfo.class.getDeclaredFields()) {
             if (field.isAnnotationPresent(SerializedName.class)) {
                 String name = field.getAnnotation(SerializedName.class).value();
                 if (attributeNames.contains(new Attributes.Name(name))) {

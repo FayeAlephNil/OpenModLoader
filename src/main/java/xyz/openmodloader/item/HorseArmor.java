@@ -11,9 +11,7 @@ import net.minecraft.item.ItemStack;
 public interface HorseArmor {
 
     /**
-     * Gets the HorseArmorType to use for this horse armor. New HorseArmorType
-     * can be created through
-     * {@link xyz.openmodloader.util.EnumUtils#addHorseArmorType(String, int, String, String)}
+     * Gets the HorseArmorType to use for this horse armor.
      * 
      * @param stack The ItemStack instance of the armor.
      * @return The HorseArmorType to use for the armor item.

@@ -31,12 +31,12 @@ import xyz.openmodloader.util.InternalUtils;
 
 class LoadHandler {
 
-    private final Map<String, ModContainer> idMap = new HashMap<>();
-    private List<ModContainer> modList = new ArrayList<>();
+    private final Map<String, ModInfo> idMap = new HashMap<>();
+    private List<ModInfo> modList = new ArrayList<>();
 
     private final Map<String, Version> missingDeps = new HashMap<>();
-    private final Map<ModContainer, Version> outdatedDeps = new HashMap<>();
-    private final Multimap<String, ModContainer> duplicates = Multimaps.newSetMultimap(new HashMap<>(), () -> new HashSet<>());
+    private final Map<ModInfo, Version> outdatedDeps = new HashMap<>();
+    private final Multimap<String, ModInfo> duplicates = Multimaps.newSetMultimap(new HashMap<>(), () -> new HashSet<>());
 
     private final File modsDirectory;
     private final boolean searchClassPath;
@@ -67,13 +67,13 @@ class LoadHandler {
         // sort the mods
         sort();
         // add OML to the beginning of the mod list
-        ModContainer oml = new OMLModContainer();
+        ModInfo oml = new OMLModInfo();
         modList.add(0, oml);
         idMap.put(oml.getModID(), oml);
         // check dependencies and duplicates
         if (checkDependencies() && duplicates.isEmpty()) {
             // if everything is okay, load the mod transformers and return true
-            for (ModContainer mod : modList) {
+            for (ModInfo mod : modList) {
                 for (String exclusion : mod.getTransformerExclusions()) {
                     Launch.classLoader.addTransformerExclusion(exclusion);
                 }
@@ -94,14 +94,14 @@ class LoadHandler {
                         missingDeps.add(e.getKey() + " v" + e.getValue() + " or higher");
                 }
                 List<String> outdatedDeps = new ArrayList<>();
-                for (Entry<ModContainer, Version> e : this.outdatedDeps.entrySet()) {
+                for (Entry<ModInfo, Version> e : this.outdatedDeps.entrySet()) {
                     outdatedDeps.add(e.getKey().getName() + " v" + e.getKey().getVersion() + " (requires v" + e.getValue() + " or higher)");
                 }
                 List<String> duplicates = new ArrayList<>();
                 for (String modid : this.duplicates.keySet()) {
                     StringBuilder b = new StringBuilder();
                     b.append(modid).append(": ");
-                    for (ModContainer mod : this.duplicates.get(modid)) {
+                    for (ModInfo mod : this.duplicates.get(modid)) {
                         b.append(mod.getModFile().getName()).append(", ");
                     }
                     duplicates.add(b.substring(0, b.length() - 2));
@@ -116,21 +116,21 @@ class LoadHandler {
         }
     }
 
-    public List<ModContainer> getModList() {
+    public List<ModInfo> getModList() {
         return modList;
     }
 
-    public Map<String, ModContainer> getIdMap() {
+    public Map<String, ModInfo> getIdMap() {
         return idMap;
     }
 
     private boolean checkDependencies() {
-        for (ModContainer mod : modList) {
+        for (ModInfo mod : modList) {
             for (String dep : mod.getDependencies()) {
                 String[] depParts = dep.split("\\s*:\\s*");
                 if (depParts[0].startsWith("optional "))
                     continue;
-                ModContainer depContainer = idMap.get(depParts[0]);
+                ModInfo depContainer = idMap.get(depParts[0]);
                 Version min = depParts.length > 1 ? new Version(depParts[1]) : new Version(0, 0, 0);
                 if (depContainer == null) {
                     Version v = missingDeps.get(depParts[0]);
@@ -167,7 +167,7 @@ class LoadHandler {
                         JarFile jar = new JarFile(file);
                         Manifest manifest = jar.getManifest();
                         if (manifest != null && manifest.getMainAttributes().containsKey(new Attributes.Name("ID"))) {
-                            ManifestModContainer mod = registerMod(file, manifest);
+                            ManifestModInfo mod = registerMod(file, manifest);
                             // load the logo (oh I hate this code...)
                             if (mod.getLogo() != null) {
                                 try (InputStream in = jar.getInputStream(jar.getJarEntry(mod.getLogo()))) {
@@ -235,11 +235,11 @@ class LoadHandler {
      * @param file the file
      * @param manifest the manifest
      */
-    private ManifestModContainer registerMod(File file, Manifest manifest) {
-        ManifestModContainer mod = loadMod(file, manifest);
+    private ManifestModInfo registerMod(File file, Manifest manifest) {
+        ManifestModInfo mod = loadMod(file, manifest);
         if (mod != null) {
             if (idMap.containsKey(mod.getModID())) {
-                ModContainer mod2 = idMap.get(mod.getModID());
+                ModInfo mod2 = idMap.get(mod.getModID());
                 duplicates.put(mod.getModID(), mod);
                 duplicates.put(mod.getModID(), mod2);
                 log.error("Duplicate mod IDs for files '%s' and '%s'", mod.getModFile(), mod2.getModFile());
@@ -259,8 +259,8 @@ class LoadHandler {
      * @param manifest the manifest instance
      * @return the manifest mod container
      */
-    private ManifestModContainer loadMod(File file, Manifest manifest) {
-        ManifestModContainer container = ManifestModContainer.create(file, manifest);
+    private ManifestModInfo loadMod(File file, Manifest manifest) {
+        ManifestModInfo container = ManifestModInfo.create(file, manifest);
         if (container == null) {
             log.error("Found invalid manifest in file " + file);
             return null;
@@ -291,8 +291,8 @@ class LoadHandler {
     }
 
     private void sort() {
-        LinkedList<ModContainer> sorted = Lists.newLinkedList();
-        for (ModContainer mod : modList) {
+        LinkedList<ModInfo> sorted = Lists.newLinkedList();
+        for (ModInfo mod : modList) {
             if (sorted.isEmpty() || mod.getDependencies().length == 0)
                 sorted.addFirst(mod);
             else {

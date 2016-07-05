@@ -7,15 +7,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeDecorator;
-import xyz.openmodloader.registry.NamespacedRegistry;
-import xyz.openmodloader.registry.OMLRegistry;
+import xyz.openmodloader.registry.AutomaticNamespacedRegistry;
+import xyz.openmodloader.registry.Registries;
 
 /**
  * Helper class for world generation hooks.
  */
 public final class WorldGenHooks {
 
-    private static final NamespacedRegistry<ResourceLocation, WorldGenerator> generation = OMLRegistry.getRegistry(WorldGenerator.class);
+    private static AutomaticNamespacedRegistry<ResourceLocation, WorldGenerator> registry;
+
+    private static AutomaticNamespacedRegistry<ResourceLocation, WorldGenerator> getRegistry() {
+        if (registry == null) {
+            registry = Registries.get(WorldGenerator.class);
+        }
+        return registry;
+    }
 
     /**
      * Generates features for a chunk. This should be called from custom
@@ -29,8 +36,8 @@ public final class WorldGenHooks {
      * @param chunkPos the chunk pos
      */
     public static void runGenerators(Biome biome, World world, Random random, BlockPos chunkPos) {
-        for (WorldGenerator feature : generation) {
-            feature.generate(biome, world, random, chunkPos);
+        for (WorldGenerator generator : getRegistry()) {
+            generator.generate(biome, world, random, chunkPos);
         }
     }
 }

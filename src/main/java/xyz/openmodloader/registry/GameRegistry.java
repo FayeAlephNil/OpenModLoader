@@ -1,9 +1,7 @@
 package xyz.openmodloader.registry;
 
 import java.util.Arrays;
-import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -25,126 +23,158 @@ public class GameRegistry {
      * Initializes the registry.
      */
     public static void init() {
+        Registries.register(HorseArmorType.class);
         registerHorseArmor(new ResourceLocation("none"), HorseArmorType.NONE);
         registerHorseArmor(new ResourceLocation("iron"), HorseArmorType.IRON);
         registerHorseArmor(new ResourceLocation("gold"), HorseArmorType.GOLD);
         registerHorseArmor(new ResourceLocation("diamond"), HorseArmorType.DIAMOND);
+        Registries.register(WorldGenerator.class);
     }
 
     /**
-     * Registers a new horse armor.
+     * Registers a horse armor.
      *
-     * @param identifier the identifier
-     * @param horseArmor the horse armor
+     * @param id the ID of the horse armor. Must be unique.
+     * @param type the horse armor type
      */
-    public static void registerHorseArmor(ResourceLocation identifier, HorseArmorType horseArmor) {
-        OMLRegistry.getRegistry(HorseArmorType.class).register(identifier, horseArmor);
-    }
-
-    /**
-     * Registers a block.
-     *
-     * @param identifier the identifier - must be unique
-     * @param block the block
-     */
-    public static void registerBlock(ResourceLocation identifier, Block block) {
-        registerBlock(identifier, block, new ItemBlock(block));
-    }
-
-    /**
-     * Registers a block.
-     *
-     * @param identifier the identifier - must be unique
-     * @param block the block
-     * @param itemBlock the item block
-     */
-    public static void registerBlock(ResourceLocation identifier, Block block, ItemBlock itemBlock) {
-        NamespacedRegistry<ResourceLocation, Block> blockRegistry = OMLRegistry.getRegistry(Block.class);
-        NamespacedRegistry<ResourceLocation, Item> itemRegistry = OMLRegistry.getRegistry(Item.class);
-        if (block == null || itemBlock == null) {
-            throw new NullPointerException("Neither the block nor the itemblock may be null");
-        } else if (identifier == null) {
-            throw new NullPointerException("The identifier cannot be null!");
-        } else if (blockRegistry.containsKey(identifier)) {
-            throw new RuntimeException(String.format("The ID %s has already been registered for %s. It will not be registered again.", identifier, blockRegistry.getObject(identifier)));
-        } else if (itemRegistry.containsKey(identifier)) {
-            throw new RuntimeException(String.format("The ID %s has already been registered for %s. It will not be registered again.", identifier, itemRegistry.getObject(identifier)));
+    public static void registerHorseArmor(ResourceLocation id, HorseArmorType type) {
+        AutomaticNamespacedRegistry<ResourceLocation, HorseArmorType> registry = Registries.get(HorseArmorType.class);
+        if (type == null) {
+            throw new NullPointerException("Attempted to register a null horse armor");
+        } else if (id == null) {
+            throw new NullPointerException("Attempted to register a horse armor with a null ID");
+        } else if (registry.containsKey(id)) {
+            throw new IllegalArgumentException(String.format("The horse armor ID \"%s\" has already been registered", id));
         }
-        blockRegistry.register(identifier, block);
+        registry.register(id, type);
+    }
+
+    /**
+     * Registers a block with a block item.
+     *
+     * @param id the ID of the block. Must be unique.
+     * @param block the block
+     */
+    public static void registerBlock(ResourceLocation id, Block block) {
+        registerBlock(id, block, new ItemBlock(block));
+    }
+
+    /**
+     * Registers a block.
+     *
+     * @param id the ID of the block. Must be unique.
+     * @param block the block
+     * @param item the block item.
+     *             null if the block does not have an item.
+     */
+    public static void registerBlock(ResourceLocation id, Block block, ItemBlock item) {
+        AutomaticNamespacedRegistry<ResourceLocation, Block> blockRegistry = Registries.get(Block.class);
+        AutomaticNamespacedRegistry<ResourceLocation, Item> itemRegistry = Registries.get(Item.class);
+        if (block == null) {
+            throw new NullPointerException("Attempted to register a null block");
+        } else if (id == null) {
+            throw new NullPointerException("Attempted to register a block with a null ID");
+        } else if (blockRegistry.containsKey(id)) {
+            throw new IllegalArgumentException(String.format("The block ID \"%s\" has already been registered", id));
+        } else if (itemRegistry.containsKey(id)) {
+            throw new IllegalArgumentException(String.format("The item ID \"%s\" has already been registered", id));
+        }
+        blockRegistry.register(id, block);
+        int integerID = blockRegistry.getIDForObject(block);
         for (IBlockState state : block.getBlockState().getValidStates()) {
-            Block.BLOCK_STATE_IDS.put(state, OMLRegistry.getRegistry(Block.class).getIDForObject(block) << 4 | block.getMetaFromState(state));
+            Block.BLOCK_STATE_IDS.put(state, integerID << 4 | block.getMetaFromState(state));
         }
-        itemRegistry.register(Block.getIdFromBlock(itemBlock.getBlock()), Block.REGISTRY.getNameForObject(itemBlock.getBlock()), itemBlock);
-        OMLRegistry.getBlockItemMap().put(block, itemBlock);
+        if (item != null) {
+            Registries.get(Item.class).register(integerID, id, item);
+            Registries.getBlockItemMap().put(block, item);
+        }
     }
 
     /**
-     * Register item.
+     * Registers an item.
      *
-     * @param identifier the identifier
+     * @param id the ID of the item. Must be unique.
      * @param item the item
      */
-    public static void registerItem(ResourceLocation identifier, Item item) {
-        NamespacedRegistry<ResourceLocation, Item> itemRegistry = OMLRegistry.getRegistry(Item.class);
+    public static void registerItem(ResourceLocation id, Item item) {
+        AutomaticNamespacedRegistry<ResourceLocation, Item> registry = Registries.get(Item.class);
         if (item == null) {
-            throw new NullPointerException("The item cannot be null");
-        } else if (identifier == null) {
-            throw new NullPointerException("The identifier cannot be null!");
-        } else if (itemRegistry.containsKey(identifier)) {
-            throw new RuntimeException(String.format("The ID %s has already been registered for %s. It will not be registered again.", identifier, itemRegistry.getObject(identifier)));
+            throw new NullPointerException("Attempted to register a null item");
+        } else if (id == null) {
+            throw new NullPointerException("Attempted to register an item with a null ID");
+        } else if (registry.containsKey(id)) {
+            throw new IllegalArgumentException(String.format("The item ID %s has already been registered", id));
         }
-        itemRegistry.register(identifier, item);
+        registry.register(id, item);
     }
 
     /**
      * Registers a world generator.
      *
-     * @param identifier the identifier
-     * @param gen the generation
+     * @param id the ID of the generator. Must be unique.
+     * @param generator the generator
      */
-    public static void registerWorldGen(ResourceLocation identifier, WorldGenerator gen) {
-        NamespacedRegistry<ResourceLocation, WorldGenerator> registry = OMLRegistry.getRegistry(WorldGenerator.class);
-        if (gen == null) {
-            throw new NullPointerException("The generator cannot be null");
-        } else if (identifier == null) {
-            throw new NullPointerException("The identifier cannot be null!");
-        } else if (registry.containsKey(identifier)) {
-            throw new RuntimeException(String.format("The ID %s has already been registered for %s. It will not be registered again.", identifier, registry.getObject(identifier)));
+    public static void registerWorldGen(ResourceLocation id, WorldGenerator generator) {
+        AutomaticNamespacedRegistry<ResourceLocation, WorldGenerator> registry = Registries.get(WorldGenerator.class);
+        if (generator == null) {
+            throw new NullPointerException("Attempted to register a null world generator");
+        } else if (id == null) {
+            throw new NullPointerException("Attempted to register a world generator with a null ID");
+        } else if (registry.containsKey(id)) {
+            throw new IllegalArgumentException(String.format("The world generator ID \"%s\" has already been registered", id));
         }
-        registry.register(identifier, gen);
+        registry.register(id, generator);
     }
 
     /**
      * Registers an ore generator to the world generator registry.
      *
-     * @param id the generator id
+     * @param id the generator ID. Must be unique.
      * @param ore the ore
      * @param replaceables the blocks the ore may spawn in, usually stone for
      *        the overworld and netherrack for the nether
-     * @param veinType the vein type
      * @param veinSize the vein size
      * @param minY the minimum Y level the ore may spawn at
      * @param maxY the maximum Y level the ore may spawn at
-     * @param dimensions the dimensions the ore may spawn in - may be
-     *        {@link Short#MAX_VALUE} as a wildcard
+     * @param dimensions the dimensions the ore may spawn in. May be
+     *        {@link Short#MAX_VALUE} as a wildcard.
      * @param attempts the number of attempts at spawning the ore per chunk
-     * @see OreVeinType
      */
     public static void registerOreGen(ResourceLocation id, IBlockState ore, IBlockState[] replaceables, int veinSize, int minY, int maxY, int[] dimensions, int attempts) {
-        Set<IBlockState> replaceables0 = ImmutableSet.copyOf(replaceables);
-        int[] dimensions0 = Arrays.copyOf(dimensions, dimensions.length);
-        WorldGenMinable mineable = new WorldGenMinable(ore, veinSize, (b) -> replaceables0.contains(b));
+        List<IBlockState> replaceableList = Arrays.asList(replaceables);
+        WorldGenMinable generator = new WorldGenMinable(ore, veinSize, replaceableList::contains);
         registerWorldGen(id, (biome, world, random, chunkPos) -> {
-            for (int dim : dimensions0) {
-                if (dim != world.provider.getDimensionType().getId() && dim != Short.MAX_VALUE) {
+            for (int dimension : dimensions) {
+                if (dimension != world.provider.getDimensionType().getId() && dimension != Short.MAX_VALUE) {
                     continue;
                 }
                 for (int attempt = 0; attempt < attempts; attempt++) {
-                    BlockPos pos = chunkPos.add(world.rand.nextInt(16), world.rand.nextInt(maxY - minY + 1) + minY, world.rand.nextInt(16));
-                    mineable.generate(world, world.rand, pos);
+                    int xOffset = world.rand.nextInt(16);
+                    int yOffset = world.rand.nextInt(maxY - minY + 1) + minY;
+                    int zOffset = world.rand.nextInt(16);
+                    BlockPos pos = chunkPos.add(xOffset, yOffset, zOffset);
+                    generator.generate(world, world.rand, pos);
                 }
                 return;
             }
         });
+    }
+
+    /**
+     * Registers an ore generator to the world generator registry.
+     *
+     * @param id the generator ID. Must be unique.
+     * @param ore the ore
+     * @param replaceable the block the ore may spawn in, usually stone for
+     *        the overworld and netherrack for the nether
+     * @param veinSize the vein size
+     * @param minY the minimum Y level the ore may spawn at
+     * @param maxY the maximum Y level the ore may spawn at
+     * @param dimension the dimension the ore may spawn in. May be
+     *        {@link Short#MAX_VALUE} as a wildcard.
+     * @param attempts the number of attempts at spawning the ore per chunk
+     */
+    public static void registerOreGen(ResourceLocation id, IBlockState ore, IBlockState replaceable, int veinSize, int minY, int maxY, int dimension, int attempts) {
+        registerOreGen(id, ore, new IBlockState[]{replaceable}, veinSize, minY, maxY, new int[]{dimension}, attempts);
     }
 }

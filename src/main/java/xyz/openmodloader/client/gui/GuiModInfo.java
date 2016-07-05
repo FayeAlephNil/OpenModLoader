@@ -13,7 +13,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import xyz.openmodloader.launcher.strippable.Side;
 import xyz.openmodloader.launcher.strippable.Strippable;
-import xyz.openmodloader.modloader.ModContainer;
+import xyz.openmodloader.modloader.ModInfo;
 import xyz.openmodloader.modloader.version.UpdateManager;
 
 @Strippable(side = Side.CLIENT)
@@ -22,10 +22,10 @@ public class GuiModInfo extends GuiScreen {
     private static final ResourceLocation ICON_UPDATE = new ResourceLocation("realms", "textures/gui/realms/trial_icon.png");
 
     private GuiModList parent;
-    private ModContainer container;
+    private ModInfo container;
     private ResourceLocation logo;
 
-    public GuiModInfo(GuiModList parent, ModContainer container) {
+    public GuiModInfo(GuiModList parent, ModInfo container) {
         this.parent = parent;
         this.container = container;
         this.logo = container.getLogoTexture();

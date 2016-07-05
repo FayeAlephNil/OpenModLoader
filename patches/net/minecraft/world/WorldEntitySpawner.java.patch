@@ -1,0 +1,13 @@
+--- /net/minecraft/world
++++ /net/minecraft/world
+@@ -113,7 +113,9 @@
+                                                     var36.printStackTrace();
+                                                     return var37;
+                                                 }
+-
++                                                xyz.openmodloader.event.impl.LivingEvent.Spawn event = xyz.openmodloader.event.impl.LivingEvent.Spawn.handle(var34);
++                                                if (event.isCanceled()) return var37;
++                                                var34 = (EntityLiving) event.getLiving();
+                                                 var34.setLocationAndAngles((double)var32, (double)var25, (double)var33, var1.rand.nextFloat() * 360.0F, 0.0F);
+                                                 if(var34.getCanSpawnHere() && var34.isNotColliding()) {
+                                                     var29 = var34.onInitialSpawn(var1.getDifficultyForLocation(new BlockPos(var34)), var29);

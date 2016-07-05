@@ -1,6 +1,17 @@
 --- /net/minecraft/entity/player
 +++ /net/minecraft/entity/player
-@@ -1174,7 +1174,8 @@
+@@ -831,6 +831,10 @@
+ 
+     protected void damageEntity(DamageSource var1, float var2) {
+         if(!this.isEntityInvulnerable(var1)) {
++            xyz.openmodloader.event.impl.LivingEvent.Hurt event = xyz.openmodloader.event.impl.LivingEvent.Hurt.handle(this, var1, var2);
++            if (event.isCanceled()) return;
++            var1 = event.getSource();
++            var2 = event.getDamage();
+             var2 = this.applyArmorCalculations(var1, var2);
+             var2 = this.applyPotionDamageCalculations(var1, var2);
+             float var3 = var2;
+@@ -1174,7 +1178,8 @@
  
          this.setSize(0.2F, 0.2F);
          if(this.worldObj.isBlockLoaded(var1)) {
@@ -10,7 +21,7 @@
              float var3 = 0.5F;
              float var8 = 0.5F;
              switch(var7) {
-@@ -1255,7 +1256,7 @@
+@@ -1255,7 +1260,7 @@
      }
  
      private boolean isInBed() {
@@ -19,7 +30,7 @@
      }
  
      @Nullable
-@@ -1279,7 +1280,8 @@
+@@ -1279,7 +1284,8 @@
      )
      public float getBedOrientationInDegrees() {
          if(this.playerLocation != null) {
@@ -29,7 +40,7 @@
              switch(var1) {
              case SOUTH:
                  return 90.0F;
-@@ -1646,6 +1648,9 @@
+@@ -1646,6 +1652,9 @@
      }
  
      public void setItemStackToSlot(EntityEquipmentSlot var1, @Nullable ItemStack var2) {

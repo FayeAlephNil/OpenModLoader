@@ -18,13 +18,27 @@ import xyz.openmodloader.launcher.strippable.Side;
 import xyz.openmodloader.launcher.strippable.Strippable;
 import xyz.openmodloader.modloader.version.Version;
 
-class OMLModContainer implements ModContainer {
+/**
+ * An implementation of {@link ModInfo} that is specifically for Open Mod
+ * Loader.
+ */
+public final class OMLModInfo implements ModInfo {
 
+    /**
+     * The file the mod was loaded from.
+     */
     private final File modFile;
+
+    /**
+     * The logo file for the mod.
+     */
     private ResourceLocation logo;
 
-    public OMLModContainer() {
-        modFile = new File(OMLModContainer.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+    /**
+     * Constructor for the OML mod info. This shouldn't be used externally.
+     */
+    public OMLModInfo() {
+        modFile = new File(OMLModInfo.class.getProtectionDomain().getCodeSource().getLocation().getPath());
     }
 
     @Override

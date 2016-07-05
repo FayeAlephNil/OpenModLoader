@@ -5,7 +5,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import xyz.openmodloader.OpenModLoader;
@@ -18,26 +21,24 @@ import xyz.openmodloader.modloader.version.UpdateManager;
 /**
  * The class responsible for registering and loading mods. Loads mods from the
  * mods folder and the classpath. Mods are defined by the MANIFEST.MF file of
- * the mod jar. See {@link ManifestModContainer} for more info.
+ * the mod jar. See {@link ManifestModInfo} for more info.
  */
 public class ModLoader {
 
     /**
-     * A list of all loaded mods.
+     * A list all detected mod info.
      */
-    private static final List<ModContainer> MODS = new ArrayList<>();
+    private static final List<ModInfo> MODS = new ArrayList<>();
 
     /**
-     * A map of all loaded mods. Key is the mod class and value is the
-     * ModContainer.
+     * A map of all loaded mods. Key is the mod class and value is the ModInfo.
      */
-    private static final Map<Mod, ModContainer> MODS_MAP = new HashMap<>();
+    private static final Map<Mod, ModInfo> MODS_MAP = new HashMap<>();
 
     /**
-     * A map of all loaded mods. Key is the mod id and value is the
-     * ModContainer.
+     * A map of all loaded mods. Key is the mod id and value is the ModInfo.
      */
-    private static final Map<String, ModContainer> ID_MAP = new HashMap<>();
+    private static final Map<String, ModInfo> ID_MAP = new HashMap<>();
 
     /**
      * The running directory for the game.
@@ -50,21 +51,9 @@ public class ModLoader {
     private static final File MOD_DIRECTORY = new File(RUN_DIRECTORY, "mods");
 
     /**
-     * Cached immutable versions of the lists and maps used by the loader.
-     */
-    private static final List<ModContainer> UNM_MODS = Collections.unmodifiableList(MODS);
-    private static final Map<Mod, ModContainer> UNM_MODS_MAP = Collections.unmodifiableMap(MODS_MAP);
-    private static final Map<String, ModContainer> UNM_ID_MAP = Collections.unmodifiableMap(ID_MAP);
-
-    /**
-     * Attempts to load all mods from the mods directory and the classpath.
-     * While this is public, it is intended for internal use only!
-     * 
-     * <br>
-     * This is called from
+     * Attempts to detect mods from the specified mods directory and the class
+     * path. This should only be used internally! Called from
      * {@link OMLTweaker#injectIntoClassLoader(LaunchClassLoader)}}.
-     *
-     * @throws Exception the exception
      */
     public static void registerMods() throws Exception {
         LoadHandler load = new LoadHandler(MOD_DIRECTORY, true, OpenModLoader.getLogger());
@@ -76,16 +65,13 @@ public class ModLoader {
     }
 
     /**
-     * Iterates through all registered mods and enables them. If there is an
-     * issue in registering the mod, it will be disabled.
-     * 
-     * <br>
-     * This is called from
+     * Iterates through all registered mods and loads them. If the mod can not
+     * be loaded it will be disabled. Called from
      * {@link OpenModLoader#minecraftConstruction(SidedHandler)}.
      */
     public static void loadMods() {
         // load the instances
-        for (ModContainer mod : MODS) {
+        for (ModInfo mod : MODS) {
             // if this is the wrong side, skip the mod
             if (mod.getSide() != Side.UNIVERSAL && mod.getSide() != OpenModLoader.getSidedHandler().getSide()) {
                 continue;
@@ -112,7 +98,7 @@ public class ModLoader {
             }
         }
         // initialize the mods and start update checker
-        for (ModContainer mod : MODS) {
+        for (ModInfo mod : MODS) {
             // if this is the wrong side, skip the mod
             if (mod.getSide() != Side.UNIVERSAL && mod.getSide() != OpenModLoader.getSidedHandler().getSide()) {
                 continue;
@@ -137,58 +123,69 @@ public class ModLoader {
      *
      * @return an immutable and sorted list of mods
      */
-    public static List<ModContainer> getModList() {
-        return UNM_MODS;
+    public static List<ModInfo> getModList() {
+        return MODS;
     }
 
     /**
-     * Returns an immutable map of mod IDs to mod containers.
-     *
-     * @return an immutable map of mod IDs to mod containers
+     * Gets a map of mods and their mod ID. This map is not immutable, but
+     * should not be edited externally!
+     * 
+     * @return A map of mods and their mod ID.
      */
-    public static Map<String, ModContainer> getIndexedModList() {
-        return UNM_ID_MAP;
+    public static Map<String, ModInfo> getIndexedModList() {
+        return ID_MAP;
     }
 
     /**
-     * Returns an immutable map of mod objects to mod containers. <br>
-     * <b>This map may be smaller than {@link #getModList()} and
-     * {@link #getIndexedModList()}. It only contains mods that specify a mod
-     * class.
-     *
-     * @return an immutable map of mod objects to mod containers
+     * Gets a map of mods and their info. This map is not immutable, but should
+     * not be edited externally!
+     * 
+     * @return A map of mods and their info.
      */
-    public static Map<Mod, ModContainer> getModInstanceList() {
-        return UNM_MODS_MAP;
+    public static Map<Mod, ModInfo> getModMap() {
+        return MODS_MAP;
     }
 
     /**
-     * Get the mod container of a mod.
-     *
-     * @param mod the mod instance
-     * @return the mod container
+     * Gets the {@link ModInfo} for a mod. This can be null if the mod does not
+     * have info.
+     * 
+     * @param mod The mod to get info for.
+     * @return The ModInfo for the mod.
      */
-    public static ModContainer getContainer(Mod mod) {
+    public static ModInfo getModInfo(Mod mod) {
         return MODS_MAP.get(mod);
     }
 
     /**
-     * Get the mod container of a mod.
-     *
-     * @param id the mod id
-     * @return the mod container
+     * Gets the {@link ModInfo} for a mod. This can be null if no mod is found.
+     * 
+     * @param id The ID of the mod being searched for.
+     * @return The ModInfo for the specified ID.
      */
-    public static ModContainer getContainer(String id) {
+    public static ModInfo getModInfo(String id) {
         return ID_MAP.get(id);
     }
 
     /**
-     * Checks if a mod with the specified id is loaded.
-     *
-     * @param id the id
-     * @return true, if the mod is loaded
+     * Checks if a mod is loaded.
+     * 
+     * @param id The ID of the mod being searched for.
+     * @return Whether or not a mod with the specified ID is loaded.
      */
     public static boolean isModLoaded(String id) {
         return ID_MAP.containsKey(id);
+    }
+
+    /**
+     * Adds a new mod info to the loader. This will not load a new mod, but
+     * allows new mod list entries to be added.
+     * 
+     * @param info The mod info to add.
+     */
+    public static void addModInfo(ModInfo info) {
+        MODS.add(info);
+        ID_MAP.put(info.getModID(), info);
     }
 }

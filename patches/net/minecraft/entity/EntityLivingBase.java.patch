@@ -1,0 +1,45 @@
+--- /net/minecraft/entity
++++ /net/minecraft/entity
+@@ -656,7 +656,9 @@
+     public void heal(float var1) {
+         float var2 = this.getHealth();
+         if(var2 > 0.0F) {
+-            this.setHealth(var2 + var1);
++            xyz.openmodloader.event.impl.LivingEvent.Heal event = xyz.openmodloader.event.impl.LivingEvent.Heal.handle(this, var1);
++            if (event.isCanceled()) return;
++            this.setHealth(var2 + event.getHealAmount());
+         }
+ 
+     }
+@@ -941,6 +943,9 @@
+     }
+ 
+     public void fall(float var1, float var2) {
++        xyz.openmodloader.event.impl.LivingEvent.Fall event = xyz.openmodloader.event.impl.LivingEvent.Fall.handle(this, var1, var2);
++        var1 = event.getDistance();
++        var2 = event.getDamageMultiplier();
+         super.fall(var1, var2);
+         PotionEffect var3 = this.getActivePotionEffect(MobEffects.JUMP_BOOST);
+         float var4 = var3 == null?0.0F:(float)(var3.getAmplifier() + 1);
+@@ -1015,6 +1020,10 @@
+ 
+     protected void damageEntity(DamageSource var1, float var2) {
+         if(!this.isEntityInvulnerable(var1)) {
++            xyz.openmodloader.event.impl.LivingEvent.Hurt event = xyz.openmodloader.event.impl.LivingEvent.Hurt.handle(this, var1, var2);
++            if (event.isCanceled()) return;
++            var1 = event.getSource();
++            var2 = event.getDamage();
+             var2 = this.applyArmorCalculations(var1, var2);
+             var2 = this.applyPotionDamageCalculations(var1, var2);
+             float var3 = var2;
+@@ -1284,7 +1293,9 @@
+     }
+ 
+     protected void jump() {
+-        this.motionY = (double)this.getJumpUpwardsMotion();
++        xyz.openmodloader.event.impl.LivingEvent.Jump event = xyz.openmodloader.event.impl.LivingEvent.Jump.handle(this, getJumpUpwardsMotion());
++        if (event.isCanceled()) return;
++        this.motionY = (double)event.getMotion();
+         if(this.isPotionActive(MobEffects.JUMP_BOOST)) {
+             this.motionY += (double)((float)(this.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1F);
+         }

@@ -1,6 +1,6 @@
 --- /net/minecraft/entity/passive
 +++ /net/minecraft/entity/passive
-@@ -7,12 +7,12 @@
+@@ -7,11 +7,11 @@
  import xyz.openmodloader.launcher.strippable.Side;
  import xyz.openmodloader.launcher.strippable.Strippable;
  
@@ -9,16 +9,14 @@
 -    IRON(5, "iron", "meo"),
 -    GOLD(7, "gold", "goo"),
 -    DIAMOND(11, "diamond", "dio");
--
 +public class HorseArmorType {
-+    public static final HorseArmorType NONE = new HorseArmorType(0),
-+    IRON = new HorseArmorType(5, "iron", "meo"),
-+    GOLD = new HorseArmorType(7, "gold", "goo"),
-+    DIAMOND = new HorseArmorType(11, "diamond", "dio");
-+    
++    public static final HorseArmorType NONE = new HorseArmorType(0);
++    public static final HorseArmorType IRON = new HorseArmorType(5, "iron", "meo");
++    public static final HorseArmorType GOLD = new HorseArmorType(7, "gold", "goo");
++    public static final HorseArmorType DIAMOND = new HorseArmorType(11, "diamond", "dio");
+ 
      private final String textureName;
      private final String hash;
-     private final int protection;
 @@ -23,14 +23,14 @@
          this.hash = "";
      }
@@ -32,7 +30,7 @@
  
      public int getOrdinal() {
 -        return this.ordinal();
-+        return xyz.openmodloader.registry.OMLRegistry.getRegistry(HorseArmorType.class).getIDForObject(this);
++        return xyz.openmodloader.registry.Registries.get(HorseArmorType.class).getIDForObject(this);
      }
  
      @Strippable(
@@ -41,7 +39,7 @@
  
      public static HorseArmorType getByOrdinal(int var0) {
 -        return values()[var0];
-+        return xyz.openmodloader.registry.OMLRegistry.getRegistry(HorseArmorType.class).getObjectById(var0);
++        return xyz.openmodloader.registry.Registries.get(HorseArmorType.class).getObjectById(var0);
      }
  
      public static HorseArmorType getByItemStack(@Nullable ItemStack var0) {

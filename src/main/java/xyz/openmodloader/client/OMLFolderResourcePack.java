@@ -9,14 +9,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.FolderResourcePack;
 import net.minecraft.util.ResourceLocation;
-import xyz.openmodloader.modloader.ModContainer;
+import xyz.openmodloader.modloader.ModInfo;
 
 public class OMLFolderResourcePack extends FolderResourcePack {
 
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
-    private ModContainer mod;
+    private ModInfo mod;
 
-    public OMLFolderResourcePack(ModContainer mod) {
+    public OMLFolderResourcePack(ModInfo mod) {
         super(mod.getModFile());
         this.mod = mod;
     }

@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import xyz.openmodloader.launcher.strippable.Side;
 import xyz.openmodloader.launcher.strippable.Strippable;
-import xyz.openmodloader.modloader.ModContainer;
+import xyz.openmodloader.modloader.ModInfo;
 import xyz.openmodloader.modloader.version.UpdateManager;
 
 @Strippable(side = Side.CLIENT)
@@ -16,12 +16,12 @@ public class GuiModListSelectionEntry implements GuiListExtended.a {
     private static final ResourceLocation ICON_UPDATE = new ResourceLocation("realms", "textures/gui/realms/trial_icon.png");
 
     private GuiModListSelection parent;
-    private ModContainer container;
+    private ModInfo container;
     private Minecraft mc;
     private ResourceLocation logo;
     private long lastClickTime;
 
-    public GuiModListSelectionEntry(GuiModListSelection parent, ModContainer container) {
+    public GuiModListSelectionEntry(GuiModListSelection parent, ModInfo container) {
         this.parent = parent;
         this.container = container;
         this.mc = Minecraft.getMinecraft();

@@ -4,7 +4,7 @@
          NBTTagCompound var4 = new NBTTagCompound();
          var4.setTag("Data", var3);
  
-+        xyz.openmodloader.world.storage.OMLSaveHandler.save(var1, var4);
++        xyz.openmodloader.world.storage.OMLSaveHandler.save(var4);
          try {
              File var5 = new File(this.worldDirectory, "level.dat_new");
              File var6 = new File(this.worldDirectory, "level.dat_old");
