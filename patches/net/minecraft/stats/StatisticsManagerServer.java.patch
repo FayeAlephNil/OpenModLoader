@@ -1,0 +1,23 @@
+--- /net/minecraft/stats
++++ /net/minecraft/stats
+@@ -66,9 +66,18 @@
+ 
+     }
+ 
+-    public void unlockAchievement(EntityPlayer var1, StatBase var2, int var3) {
+-        int var4 = var2.isAchievement()?this.readStat(var2):0;
++    public void unlockAchievement(EntityPlayer var1, StatBase statBase, int data) {
++        StatBase var2 = statBase;
++        int var3 = data;
++        if (statBase.isAchievement()) {
++            xyz.openmodloader.event.impl.player.EventAchievement event = xyz.openmodloader.event.impl.player.EventAchievement.handle(var1, (Achievement) statBase, data);
++            var2 = event.achievement;
++            var3 = event.data;
++            if (event.isCanceled()) return;
++        }
++
+         super.unlockAchievement(var1, var2, var3);
++        int var4 = var2.isAchievement()?this.readStat(var2):0;
+         this.dirty.add(var2);
+         if(var2.isAchievement() && var4 == 0 && var3 > 0) {
+             this.hasUnsentAchievement = true;
