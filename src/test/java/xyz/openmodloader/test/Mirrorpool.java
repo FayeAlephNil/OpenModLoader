@@ -18,7 +18,7 @@ public class Mirrorpool {
     /**
      * Gets a list of classes that are in a package. This is done by looking at
      * the actual files.
-     * 
+     *
      * @param packageName The name of the package to search through.
      * @return A list of classes found in the specified package.
      */
@@ -41,7 +41,7 @@ public class Mirrorpool {
 
     /**
      * Recursively gets all class files in a directory.
-     * 
+     *
      * @param file The file to search through. If this is a class, it will be
      *        added itself.
      * @param packageName The package name for the file being looked at.
