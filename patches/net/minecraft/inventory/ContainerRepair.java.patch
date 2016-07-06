@@ -1,0 +1,11 @@
+--- /net/minecraft/inventory
++++ /net/minecraft/inventory
+@@ -25,7 +25,7 @@
+ import xyz.openmodloader.launcher.strippable.Side;
+ import xyz.openmodloader.launcher.strippable.Strippable;
+ 
+-public class ContainerRepair extends Container {
++public class ContainerRepair extends xyz.openmodloader.event.impl.player.EventAnvilRepair.OMLContainerRepair {
+     private static final Logger LOGGER = LogManager.getLogger();
+     private final IInventory outputSlot;
+     private final IInventory inputSlots;
