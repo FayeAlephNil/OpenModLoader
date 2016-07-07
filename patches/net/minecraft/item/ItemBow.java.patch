@@ -9,7 +9,17 @@
              ItemStack var7 = this.findAmmo(var5);
              if(var7 != null || var6) {
                  if(var7 == null) {
-@@ -95,17 +95,17 @@
+@@ -86,6 +86,9 @@
+                 int var8 = this.getMaxItemUseDuration(var1) - var4;
+                 float var9 = getArrowVelocity(var8);
+                 if((double)var9 >= 0.1D) {
++                    xyz.openmodloader.event.impl.player.EventArrow.Loose event = xyz.openmodloader.event.impl.player.EventArrow.Loose.handle((EntityPlayer) var3, var7, var2, var9, var4);
++                    if (event.isCanceled()) return;
++                    var9 = event.vel;
+                     boolean var10 = var6 && var7.getItem() == Items.ARROW;
+                     if(!var2.isRemote) {
+                         ItemArrow var11 = (ItemArrow)((ItemArrow)(var7.getItem() instanceof ItemArrow?var7.getItem():Items.ARROW));
+@@ -95,17 +98,17 @@
                              var12.setIsCritical(true);
                          }
  
@@ -30,3 +40,21 @@
                              var12.setFire(100);
                          }
  
+@@ -150,11 +153,16 @@
+     }
+ 
+     public ActionResult<ItemStack> onItemRightClick(ItemStack var1, World var2, EntityPlayer var3, EnumHand var4) {
+-        boolean var5 = this.findAmmo(var3) != null;
++        ItemStack ammo = this.findAmmo(var3);
++        boolean var5 = ammo != null;
+         if(!var3.capabilities.isCreativeMode && !var5) {
+             return !var5?new ActionResult(EnumActionResult.FAIL, var1):new ActionResult(EnumActionResult.PASS, var1);
+         } else {
+             var3.setActiveHand(var4);
++            if (var5 && xyz.openmodloader.event.impl.player.EventArrow.Nock.handle(var3, ammo, var2).isCanceled()) {
++                var3.setActiveHand(var4 == EnumHand.MAIN_HAND ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
++                return new ActionResult(EnumActionResult.FAIL, var1);
++            }
+             return new ActionResult(EnumActionResult.SUCCESS, var1);
+         }
+     }
