@@ -7,8 +7,8 @@ import xyz.openmodloader.OpenModLoader;
 import xyz.openmodloader.event.impl.EntityEvent;
 import xyz.openmodloader.event.impl.PlayerEvent;
 import xyz.openmodloader.event.impl.player.EventAchievement;
-import xyz.openmodloader.event.impl.player.EventAnvilRepair;
 import xyz.openmodloader.event.impl.player.EventArrow;
+import xyz.openmodloader.event.impl.player.EventTakeSlot;
 import xyz.openmodloader.test.TestMod;
 
 public class TestPlayerEvent implements TestMod {
@@ -17,26 +17,26 @@ public class TestPlayerEvent implements TestMod {
 
     @Override
     public void onInitialize() {
-        OpenModLoader.getEventBus().register(PlayerEvent.Craft.class, this::onCraft);
-        OpenModLoader.getEventBus().register(PlayerEvent.Smelt.class, this::onSmelt);
+        OpenModLoader.getEventBus().register(EventTakeSlot.Craft.class, this::onCraft);
+        OpenModLoader.getEventBus().register(EventTakeSlot.Smelt.class, this::onSmelt);
         OpenModLoader.getEventBus().register(PlayerEvent.ItemPickup.class, this::onPickup);
         OpenModLoader.getEventBus().register(PlayerEvent.SleepCheck.class, this::onSleepCheck);
         OpenModLoader.getEventBus().register(PlayerEvent.Track.Start.class, this::onStartTracking);
         OpenModLoader.getEventBus().register(PlayerEvent.Track.Stop.class, this::onStopTracking);
-        OpenModLoader.getEventBus().register(EventAnvilRepair.class, this::onRepair);
+        OpenModLoader.getEventBus().register(EventTakeSlot.Repair.class, this::onRepair);
         OpenModLoader.getEventBus().register(EventAchievement.class, this::onAchievement);
         OpenModLoader.getEventBus().register(EventArrow.Nock.class, this::onNock);
         OpenModLoader.getEventBus().register(EventArrow.Loose.class, this::onLoose);
     }
 
-    private void onCraft(PlayerEvent.Craft event) {
-        LOGGER.info(event.getPlayer().getName() + " crafted " + event.getResult());
+    private void onCraft(EventTakeSlot.Craft event) {
+        LOGGER.info(event.getPlayer().getName() + " crafted " + event.result);
     }
 
-    private void onSmelt(PlayerEvent.Smelt event) {
-        LOGGER.info(event.getPlayer().getName() + " smelted " + event.getResult());
-        if (event.getResult().getItem() == Items.IRON_INGOT) {
-            event.setXP(1.0F);
+    private void onSmelt(EventTakeSlot.Smelt event) {
+        LOGGER.info(event.getPlayer().getName() + " smelted " + event.result);
+        if (event.result.getItem() == Items.IRON_INGOT) {
+            event.xp = 1.0F;
         }
     }
 
@@ -58,9 +58,9 @@ public class TestPlayerEvent implements TestMod {
         LOGGER.info("Sleep check occurred for %s at %s, default result is %s", event.getPlayer(), event.getPos(), event.getResult());
     }
 
-    private void onRepair(EventAnvilRepair e) {
-        LOGGER.info("%s repaired %s into %s", e.getPlayer(), e.toRepair, e.output);
-        if (e.toRepair.getItem() instanceof ItemSword && !e.book.isPresent() && e.output.getDisplayName() == "Test") {
+    private void onRepair(EventTakeSlot.Repair e) {
+        LOGGER.info("%s repaired %s into %s", e.getPlayer(), e.toRepair, e.result);
+        if (e.toRepair.getItem() instanceof ItemSword && !e.book.isPresent() && e.result.getDisplayName() == "TestCancel") {
             e.setCanceled(true);
             LOGGER.info("The repair was cancelled");
         }
