@@ -6,6 +6,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.WorldEntitySpawner;
 import xyz.openmodloader.OpenModLoader;
 import xyz.openmodloader.event.Event;
+import xyz.openmodloader.event.impl.player.EventAttackEntity;
 
 /**
  * Parent class for world related events. All events that fall within this scope
@@ -218,6 +219,13 @@ public abstract class LivingEvent extends Event {
             Hurt event = new Hurt(entity, source, damage);
             OpenModLoader.getEventBus().post(event);
             return event;
+        }
+
+        /**
+         * Handle any events that may be fired upon this one being fired
+         */
+        static {
+            OpenModLoader.getEventBus().register(LivingEvent.Hurt.class, EventAttackEntity::handler);
         }
     }
 
