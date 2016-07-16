@@ -1,6 +1,6 @@
 --- /net/minecraft/inventory
 +++ /net/minecraft/inventory
-@@ -25,13 +25,12 @@
+@@ -25,7 +25,7 @@
  import xyz.openmodloader.launcher.strippable.Side;
  import xyz.openmodloader.launcher.strippable.Strippable;
  
@@ -9,9 +9,3 @@
      private static final Logger LOGGER = LogManager.getLogger();
      private final IInventory outputSlot;
      private final IInventory inputSlots;
-     private final World theWorld;
-     private final BlockPos selfPosition;
--    public int maximumCost;
-     private int materialCost;
-     private String repairedItemName;
-     private final EntityPlayer thePlayer;
