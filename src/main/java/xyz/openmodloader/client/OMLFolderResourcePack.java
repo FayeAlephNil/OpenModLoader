@@ -27,7 +27,12 @@ public class OMLFolderResourcePack extends FolderResourcePack {
             return super.getInputStreamByName(name);
         } catch (IOException e) {
             if ("pack.mcmeta".equals(name)) {
-                return new ByteArrayInputStream(("{\n" + "\"pack\": {\n" + "\"description\": \"OML dummy resource pack for " + mod.getModID() + "\",\n" + "\"pack_format\": 1\n" + "}\n" + "}").getBytes());
+                return new ByteArrayInputStream(("{\n" +
+                        "\"pack\": {\n" +
+                        "\"description\": \"OML dummy resource pack for " + mod.getModID() + "\",\n" +
+                        "\"pack_format\": 1\n" +
+                        "}\n" +
+                        "}").getBytes());
             } else {
                 throw e;
             }

@@ -15,6 +15,9 @@ public class OMLTestMod implements Mod {
 
     @Override
     public void onInitialize() {
+        if (Boolean.parseBoolean(System.getProperty("oml.testmod.disable"))) {
+            return;
+        }
         LOGGER.info("Loading test mods");
 
         try {

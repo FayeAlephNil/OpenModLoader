@@ -44,7 +44,11 @@ public final class OpenModLoader {
         ModLoader.loadMods();
         UpdateManager.checkForUpdates();
         getSidedHandler().onInitialize();
-        channel = ChannelManager.create("oml").createPacket("snackbar").with("component", DataTypes.TEXT_COMPONENT).handle((context, packet) -> getSidedHandler().openSnackbar(packet.get("component", DataTypes.TEXT_COMPONENT))).build();
+        channel = ChannelManager.create("oml")
+                .createPacket("snackbar")
+                .with("component", DataTypes.TEXT_COMPONENT)
+                .handle((context, packet) -> getSidedHandler().openSnackbar(packet.get("component", DataTypes.TEXT_COMPONENT)))
+                .build();
     }
 
     /**

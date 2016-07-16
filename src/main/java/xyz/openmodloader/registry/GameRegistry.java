@@ -2,15 +2,20 @@ package xyz.openmodloader.registry;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.passive.HorseArmorType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.WorldGenMinable;
+import xyz.openmodloader.OpenModLoader;
+import xyz.openmodloader.dictionary.ItemStackDictionary;
+import xyz.openmodloader.event.impl.FuelEvent;
 import xyz.openmodloader.world.generation.WorldGenerator;
 
 /**
@@ -176,5 +181,51 @@ public class GameRegistry {
      */
     public static void registerOreGen(ResourceLocation id, IBlockState ore, IBlockState replaceable, int veinSize, int minY, int maxY, int dimension, int attempts) {
         registerOreGen(id, ore, new IBlockState[]{replaceable}, veinSize, minY, maxY, new int[]{dimension}, attempts);
+    }
+
+    /**
+     * Registers a block as a fuel.
+     *
+     * @param block the block
+     * @param duration the fuel's burn time duration (in ticks)
+     */
+    public static void registerFuel(Block block, int duration) {
+        registerFuel(new ItemStack(block, 1, ItemStackDictionary.WILDCARD_METADATA), duration);
+    }
+
+    /**
+     * Registers an item as a fuel.
+     *
+     * @param item the item
+     * @param duration the fuel's burn time duration (in ticks)
+     */
+    public static void registerFuel(Item item, int duration) {
+        registerFuel(new ItemStack(item, 1, ItemStackDictionary.WILDCARD_METADATA), duration);
+    }
+
+    /**
+     * Registers a NBT-insensitive item stack as a fuel.
+     *
+     * @param stack the item stack
+     * @param duration the fuel's burn time duration (in ticks)
+     */
+    public static void registerFuel(ItemStack stack, int duration) {
+        registerFuel(stack, false, duration);
+    }
+
+    /**
+     * Registers an item stack as a fuel.
+     *
+     * @param stack the item stack
+     * @param checkNBT set to true to check NBT tags
+     * @param duration the fuel's burn time duration (in ticks)
+     */
+    public static void registerFuel(ItemStack stack, boolean checkNBT, int duration) {
+        Predicate<ItemStack> matcher = ItemStackDictionary.matcherOf(stack, checkNBT);
+        OpenModLoader.getEventBus().register(FuelEvent.class, (event) -> {
+            if (matcher.test(event.getStack())) {
+                event.setDuration(duration);
+            }
+        });
     }
 }

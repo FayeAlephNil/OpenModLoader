@@ -36,14 +36,16 @@ public class GuiSnackbar extends Gui {
     }
 
     public void drawSnackbar() {
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0F, 0.0F, 500.0F);
-        GlStateManager.translate(0.0F, -this.yOffset, 0.0F);
-        GlStateManager.enableBlend();
-        ScaledResolution resolution = new ScaledResolution(this.mc);
-        Gui.drawRect(0, 20, resolution.getScaledWidth(), 0, 0xB0000000);
-        this.mc.fontRendererObj.drawString(this.component.getFormattedText(), 10, 6, 0xFFFFFFFF);
-        GlStateManager.popMatrix();
+        if (Minecraft.isGuiEnabled()) {
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0.0F, 0.0F, 500.0F);
+            GlStateManager.translate(0.0F, -this.yOffset, 0.0F);
+            GlStateManager.enableBlend();
+            ScaledResolution resolution = new ScaledResolution(this.mc);
+            Gui.drawRect(0, 20, resolution.getScaledWidth(), 0, 0xB0000000);
+            this.mc.fontRendererObj.drawString(this.component.getFormattedText(), 10, 6, 0xFFFFFFFF);
+            GlStateManager.popMatrix();
+        }
         this.yOffset = this.interpolate(this.yOffset, this.age < this.maxAge - 10 ? 0.0F : 20.0F, 0.15F);
     }
 

@@ -5,10 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import xyz.openmodloader.OpenModLoader;
@@ -33,7 +30,7 @@ public class ModLoader {
     /**
      * A map of all loaded mods. Key is the mod class and value is the ModInfo.
      */
-    private static final Map<Mod, ModInfo> MODS_MAP = new HashMap<>();
+    private static final Map<Mod, ModInfo> INSTANCE_MAP = new HashMap<>();
 
     /**
      * A map of all loaded mods. Key is the mod id and value is the ModInfo.
@@ -49,6 +46,13 @@ public class ModLoader {
      * The directory to load mods from.
      */
     private static final File MOD_DIRECTORY = new File(RUN_DIRECTORY, "mods");
+
+    /**
+     * Cached immutable versions of the lists and maps used by the loader.
+     */
+    private static final List<ModInfo> MODS_UNM = Collections.unmodifiableList(MODS);
+    private static final Map<String, ModInfo> ID_MAP_UNM = Collections.unmodifiableMap(ID_MAP);
+    private static final Map<Mod, ModInfo> INSTANCE_MAP_UNM = Collections.unmodifiableMap(INSTANCE_MAP);
 
     /**
      * Attempts to detect mods from the specified mods directory and the class
@@ -78,7 +82,7 @@ public class ModLoader {
             }
             Mod instance = mod.getInstance();
             if (instance != null) {
-                MODS_MAP.put(instance, mod);
+                INSTANCE_MAP.put(instance, mod);
                 // populate @Instance fields
                 for (Field field : instance.getClass().getDeclaredFields()) {
                     if (field.isAnnotationPresent(Instance.class)) {
@@ -124,27 +128,25 @@ public class ModLoader {
      * @return an immutable and sorted list of mods
      */
     public static List<ModInfo> getModList() {
-        return MODS;
+        return MODS_UNM;
     }
 
     /**
-     * Gets a map of mods and their mod ID. This map is not immutable, but
-     * should not be edited externally!
+     * Gets a map of mods and their mod ID. This map is immutable.
      * 
      * @return A map of mods and their mod ID.
      */
     public static Map<String, ModInfo> getIndexedModList() {
-        return ID_MAP;
+        return ID_MAP_UNM;
     }
 
     /**
-     * Gets a map of mods and their info. This map is not immutable, but should
-     * not be edited externally!
+     * Gets a map of mods and their info. This map is immutable.
      * 
      * @return A map of mods and their info.
      */
-    public static Map<Mod, ModInfo> getModMap() {
-        return MODS_MAP;
+    public static Map<Mod, ModInfo> getModInstanceList() {
+        return INSTANCE_MAP_UNM;
     }
 
     /**
@@ -155,7 +157,7 @@ public class ModLoader {
      * @return The ModInfo for the mod.
      */
     public static ModInfo getModInfo(Mod mod) {
-        return MODS_MAP.get(mod);
+        return INSTANCE_MAP.get(mod);
     }
 
     /**
@@ -176,16 +178,5 @@ public class ModLoader {
      */
     public static boolean isModLoaded(String id) {
         return ID_MAP.containsKey(id);
-    }
-
-    /**
-     * Adds a new mod info to the loader. This will not load a new mod, but
-     * allows new mod list entries to be added.
-     * 
-     * @param info The mod info to add.
-     */
-    public static void addModInfo(ModInfo info) {
-        MODS.add(info);
-        ID_MAP.put(info.getModID(), info);
     }
 }

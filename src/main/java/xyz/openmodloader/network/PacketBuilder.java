@@ -73,7 +73,9 @@ public class PacketBuilder {
      */
     public void toAll(List<EntityPlayerMP> players) {
         PacketWrapper packet = new PacketWrapper(channel, new Packet(this));
-        players.stream().map(player -> player.connection).forEach(connection -> connection.sendPacket(packet));
+        players.stream()
+                .map(player -> player.connection)
+                .forEach(connection -> connection.sendPacket(packet));
     }
 
     /**
@@ -91,7 +93,9 @@ public class PacketBuilder {
      * @param predicate The function to test if the packet should be sent
      */
     public void toAll(List<EntityPlayerMP> players, Predicate<EntityPlayerMP> predicate) {
-        toAll(players.stream().filter(predicate).collect(Collectors.toList()));
+        toAll(players.stream()
+                .filter(predicate)
+                .collect(Collectors.toList()));
     }
 
     /**

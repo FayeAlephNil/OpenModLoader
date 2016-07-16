@@ -28,7 +28,10 @@ public class GuiModListSelection extends GuiListExtended {
     public void refreshList(String search) {
         this.selectEntry(-1);
         this.entries.clear();
-        this.entries.addAll(ModLoader.getModList().stream().filter(mod -> mod.getName().toLowerCase(Locale.ENGLISH).contains(search.toLowerCase(Locale.ENGLISH)) || mod.getModID().toLowerCase(Locale.ENGLISH).contains(search.toLowerCase(Locale.ENGLISH))).map(mod -> new GuiModListSelectionEntry(this, mod)).collect(Collectors.toList()));
+        this.entries.addAll(ModLoader.getModList().stream()
+                .filter(mod -> mod.getName().toLowerCase(Locale.ENGLISH).contains(search.toLowerCase(Locale.ENGLISH)) || mod.getModID().toLowerCase(Locale.ENGLISH).contains(search.toLowerCase(Locale.ENGLISH)))
+                .map(mod -> new GuiModListSelectionEntry(this, mod))
+                .collect(Collectors.toList()));
     }
 
     @Override

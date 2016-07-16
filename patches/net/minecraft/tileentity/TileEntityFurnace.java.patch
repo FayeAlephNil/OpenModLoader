@@ -1,18 +1,11 @@
 --- /net/minecraft/tileentity
 +++ /net/minecraft/tileentity
-@@ -245,6 +245,7 @@
-     }
+@@ -264,7 +264,7 @@
+                 }
+             }
  
-     public static int getItemBurnTime(ItemStack var0) {
-+        if(true) return xyz.openmodloader.registry.FuelRegistry.getItemBurnTime(var0);
-         if(var0 == null) {
-             return 0;
-         } else {
-@@ -269,6 +270,7 @@
-     }
- 
-     public static boolean isItemFuel(ItemStack var0) {
-+        if (true) return xyz.openmodloader.registry.FuelRegistry.isItemFuel(var0);
-         return getItemBurnTime(var0) > 0;
+-            return var1 instanceof ItemTool && "WOOD".equals(((ItemTool)var1).getToolMaterialName())?200:(var1 instanceof ItemSword && "WOOD".equals(((ItemSword)var1).getToolMaterialName())?200:(var1 instanceof ItemHoe && "WOOD".equals(((ItemHoe)var1).getMaterialName())?200:(var1 == Items.STICK?100:(var1 == Items.COAL?1600:(var1 == Items.LAVA_BUCKET?20000:(var1 == Item.getItemFromBlock(Blocks.SAPLING)?100:(var1 == Items.BLAZE_ROD?2400:0)))))));
++            return var1 instanceof ItemTool && "WOOD".equals(((ItemTool)var1).getToolMaterialName())?200:(var1 instanceof ItemSword && "WOOD".equals(((ItemSword)var1).getToolMaterialName())?200:(var1 instanceof ItemHoe && "WOOD".equals(((ItemHoe)var1).getMaterialName())?200:(var1 == Items.STICK?100:(var1 == Items.COAL?1600:(var1 == Items.LAVA_BUCKET?20000:(var1 == Item.getItemFromBlock(Blocks.SAPLING)?100:(var1 == Items.BLAZE_ROD?2400:xyz.openmodloader.event.impl.FuelEvent.handle(var0))))))));
+         }
      }
  
