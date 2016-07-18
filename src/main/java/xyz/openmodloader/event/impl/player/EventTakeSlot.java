@@ -82,32 +82,6 @@ public class EventTakeSlot extends PlayerEvent {
             OpenModLoader.getEventBus().post(event);
             return event;
         }
-
-        /**
-         * Handles the firing of the event, MC codebase is patched so that ContainerRepair extends this instead of Container
-         */
-        public static abstract class OMLContainerRepair extends Container {
-            protected int maximumCost;
-
-            /**
-             * Fires the event upon the output being taken, taking care to check if the event was canceled
-             */
-            @Override
-            @Nullable
-            public ItemStack slotClick(int var1, int var2, ClickType var3, EntityPlayer var4) {
-                if (var1 == 2 && this instanceof ContainerRepair) {
-                    Repair event = handle(var4, (ContainerRepair) this);
-                    if (this.getSlot(2).canTakeStack(var4) && !event.isCanceled()) {
-                        this.maximumCost = event.cost;
-                        return super.slotClick(var1, var2, var3, var4);
-                    } else {
-                        return null;
-                    }
-                } else {
-                    return super.slotClick(var1, var2, var3, var4);
-                }
-            }
-        }
     }
 
     /**

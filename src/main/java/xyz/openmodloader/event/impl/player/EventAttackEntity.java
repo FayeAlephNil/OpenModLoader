@@ -32,11 +32,11 @@ public class EventAttackEntity extends PlayerEvent {
         return e;
     }
 
-    private static LivingEvent.Hurt handle(LivingEvent.Hurt e) {
+    private static void handle(LivingEvent.Hurt e) {
         EntityPlayer player = (EntityPlayer) e.getSource().getEntity();
         EventAttackEntity attack = new EventAttackEntity(player, e.getSource(), e.getDamage(), e.getLiving());
         OpenModLoader.getEventBus().post(attack);
-        return attack.setAll(e);
+        attack.setAll(e);
     }
 
     public static void handler(LivingEvent.Hurt e) {

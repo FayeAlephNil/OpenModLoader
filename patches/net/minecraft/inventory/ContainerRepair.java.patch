@@ -1,11 +1,22 @@
 --- /net/minecraft/inventory
 +++ /net/minecraft/inventory
-@@ -25,7 +25,7 @@
- import xyz.openmodloader.launcher.strippable.Side;
- import xyz.openmodloader.launcher.strippable.Strippable;
+@@ -356,4 +356,19 @@
  
--public class ContainerRepair extends Container {
-+public class ContainerRepair extends xyz.openmodloader.event.impl.player.EventTakeSlot.Repair.OMLContainerRepair {
-     private static final Logger LOGGER = LogManager.getLogger();
-     private final IInventory outputSlot;
-     private final IInventory inputSlots;
+         this.updateRepairOutput();
+     }
++
++    @Override
++    public ItemStack slotClick(int slotNumber, int drag, ClickType clickType, EntityPlayer player) {
++        if (slotNumber == 2) {
++            xyz.openmodloader.event.impl.player.EventTakeSlot.Repair event = xyz.openmodloader.event.impl.player.EventTakeSlot.Repair.handle(player, (ContainerRepair) this);
++            if (this.getSlot(2).canTakeStack(player) && !event.isCanceled()) {
++                this.maximumCost = event.cost;
++                return super.slotClick(slotNumber, drag, clickType, player);
++            } else {
++                return null;
++            }
++        } else {
++            return super.slotClick(slotNumber, drag, clickType, player);
++        }
++    }
+ }
